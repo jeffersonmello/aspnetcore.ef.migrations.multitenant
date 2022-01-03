@@ -1,0 +1,1 @@
+# aspnetcore.ef.migrations.multitenant
