@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
@@ -12,9 +13,13 @@ namespace MultiTenant.Tools.MigrationTool;
 
 public class MigrationHelper
 {
+    public static string loggerTemplate =
+        "[{Timestamp:HH:mm:ss} {Level:u3}] {MainProperty}{Message:lj}{NewLine}{Exception}";
+    
     public static readonly ILogger Logger = Log.Logger = new LoggerConfiguration()
         .Enrich.FromLogContext()
-        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {TenantName}{Message:lj}{NewLine}{Exception}")
+        .WriteTo.Console(outputTemplate: loggerTemplate)
+        .WriteTo.File( Directory.GetCurrentDirectory() + "\\logs\\multitenant.migrationtool.txt", rollingInterval: RollingInterval.Day, outputTemplate: loggerTemplate)
         .CreateLogger();
     
     private static Func<EventId, LogLevel, bool> MigrationInfoLogFilter() => (eventId, level) =>
@@ -45,12 +50,11 @@ public class MigrationHelper
     {
         try
         {
-            using var logContext = LogContext.PushProperty("Cliente", $"({tenant.Nome}) ");
+            using var logContext = LogContext.PushProperty("MainProperty", $"({tenant.Nome}) ");
 
             var connection = defaultConnection.Replace("%schema%", tenant.Schema);
             var dbContextOptions = CreateDefaultDbContextOptions(connection);
 
-            
             await using var context = new SlaveContext(dbContextOptions);
             await context.Database.MigrateAsync();
         }
