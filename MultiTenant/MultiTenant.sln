@@ -1,0 +1,53 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTenant", "MultiTenant\MultiTenant.csproj", "{97AEE4A5-C2AD-4E6A-97AE-30F69C51C3C3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{7CADD253-0307-4602-80EF-FE292E885573}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Persistence", "Persistence", "{B98CA505-7F4C-4D2A-95AE-E8A0AB2047F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTenant.Model", "MultiTenant.Model\MultiTenant.Model.csproj", "{07949AA8-9D14-4AC7-BBF4-E2248A996D65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTenant.Data", "MultiTenant.Data\MultiTenant.Data.csproj", "{D5FAEC09-4819-417F-A2C4-848C83656C47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTenant.Repository", "MultiTenant.Repository\MultiTenant.Repository.csproj", "{1501EB4C-64F7-4B45-B2F2-8D890EA600FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{44B9EBDC-38E0-445A-AE40-08EB9B2D9FFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTenant.Tools.MigrationTool", "MultiTenant.Tools.MigrationTool\MultiTenant.Tools.MigrationTool.csproj", "{A3A179EB-FDA6-478A-8AD5-823172E02923}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{97AEE4A5-C2AD-4E6A-97AE-30F69C51C3C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97AEE4A5-C2AD-4E6A-97AE-30F69C51C3C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97AEE4A5-C2AD-4E6A-97AE-30F69C51C3C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97AEE4A5-C2AD-4E6A-97AE-30F69C51C3C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07949AA8-9D14-4AC7-BBF4-E2248A996D65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07949AA8-9D14-4AC7-BBF4-E2248A996D65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07949AA8-9D14-4AC7-BBF4-E2248A996D65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07949AA8-9D14-4AC7-BBF4-E2248A996D65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5FAEC09-4819-417F-A2C4-848C83656C47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5FAEC09-4819-417F-A2C4-848C83656C47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5FAEC09-4819-417F-A2C4-848C83656C47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5FAEC09-4819-417F-A2C4-848C83656C47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1501EB4C-64F7-4B45-B2F2-8D890EA600FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1501EB4C-64F7-4B45-B2F2-8D890EA600FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1501EB4C-64F7-4B45-B2F2-8D890EA600FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1501EB4C-64F7-4B45-B2F2-8D890EA600FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3A179EB-FDA6-478A-8AD5-823172E02923}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3A179EB-FDA6-478A-8AD5-823172E02923}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3A179EB-FDA6-478A-8AD5-823172E02923}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3A179EB-FDA6-478A-8AD5-823172E02923}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{97AEE4A5-C2AD-4E6A-97AE-30F69C51C3C3} = {7CADD253-0307-4602-80EF-FE292E885573}
+		{07949AA8-9D14-4AC7-BBF4-E2248A996D65} = {B98CA505-7F4C-4D2A-95AE-E8A0AB2047F9}
+		{D5FAEC09-4819-417F-A2C4-848C83656C47} = {B98CA505-7F4C-4D2A-95AE-E8A0AB2047F9}
+		{1501EB4C-64F7-4B45-B2F2-8D890EA600FD} = {B98CA505-7F4C-4D2A-95AE-E8A0AB2047F9}
+		{A3A179EB-FDA6-478A-8AD5-823172E02923} = {44B9EBDC-38E0-445A-AE40-08EB9B2D9FFF}
+	EndGlobalSection
+EndGlobal
