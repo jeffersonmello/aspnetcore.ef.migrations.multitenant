@@ -1,4 +1,4 @@
-using System.Reflection;
+using Amazon;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
@@ -7,6 +7,7 @@ using MultiTenant.Model.Master;
 using MultiTenant.Repository.Contract.Master;
 using Serilog;
 using Serilog.Context;
+using Serilog.Events;
 using ILogger = Serilog.ILogger;
 
 namespace MultiTenant.Tools.MigrationTool;
@@ -20,6 +21,16 @@ public class MigrationHelper
         .Enrich.FromLogContext()
         .WriteTo.Console(outputTemplate: loggerTemplate)
         .WriteTo.File( Directory.GetCurrentDirectory() + "\\logs\\multitenant.migrationtool.txt", rollingInterval: RollingInterval.Day, outputTemplate: loggerTemplate)
+        .WriteTo.AmazonS3(
+            "multitenant.migrationtool.txt",
+            "",
+            RegionEndpoint.USEast1,
+            "",
+            "",
+            LevelAlias.Minimum,
+            loggerTemplate,
+            rollingInterval: Serilog.Sinks.AmazonS3.RollingInterval.Day
+            )
         .CreateLogger();
     
     private static Func<EventId, LogLevel, bool> MigrationInfoLogFilter() => (eventId, level) =>
