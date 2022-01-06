@@ -1,39 +1,27 @@
-using Amazon;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using MultiTenant.Data.Context;
 using MultiTenant.Model.Master;
 using MultiTenant.Repository.Contract.Master;
+using MultiTenant.Tools.MigrationTool.Logger.Contract;
 using Serilog;
-using Serilog.Context;
-using Serilog.Events;
-using ILogger = Serilog.ILogger;
+using LogContext = Serilog.Context.LogContext;
 
 namespace MultiTenant.Tools.MigrationTool;
 
-public class MigrationHelper
+public class MigrationHelper : IMigrationHelper
 {
-    public static string loggerTemplate =
-        "[{Timestamp:HH:mm:ss} {Level:u3}] {MainProperty}{Message:lj}{NewLine}{Exception}";
+    private IClienteRepository _clienteRepository;
+    private static IApplicationLogger _logger;
     
-    public static readonly ILogger Logger = Log.Logger = new LoggerConfiguration()
-        .Enrich.FromLogContext()
-        .WriteTo.Console(outputTemplate: loggerTemplate)
-        .WriteTo.File( Directory.GetCurrentDirectory() + "\\logs\\multitenant.migrationtool.txt", rollingInterval: RollingInterval.Day, outputTemplate: loggerTemplate)
-        .WriteTo.AmazonS3(
-            "multitenant.migrationtool.txt",
-            "",
-            RegionEndpoint.USEast1,
-            "",
-            "",
-            LevelAlias.Minimum,
-            loggerTemplate,
-            rollingInterval: Serilog.Sinks.AmazonS3.RollingInterval.Day
-            )
-        .CreateLogger();
+    public MigrationHelper(IClienteRepository clienteRepository, IApplicationLogger logger)
+    {
+        _clienteRepository = clienteRepository;
+        _logger = logger;
+    }
     
-    private static Func<EventId, LogLevel, bool> MigrationInfoLogFilter() => (eventId, level) =>
+    private Func<EventId, LogLevel, bool> MigrationInfoLogFilter() => (eventId, level) =>
         level > LogLevel.Information ||
         (level == LogLevel.Information &&
          new[]
@@ -47,17 +35,27 @@ public class MigrationHelper
              RelationalEventId.MigrationsNotFound,
              RelationalEventId.MigrateUsingConnection
          }.Contains(eventId));
+
     
-    private static DbContextOptions CreateDefaultDbContextOptions(string connectionString) => 
-        new DbContextOptionsBuilder()
-            .LogTo(action: Logger.Information, filter: MigrationInfoLogFilter(), options: DbContextLoggerOptions.None)
-            .UseMySql(connectionString, new MySqlServerVersion(new Version(5, 7, 36)))
+
+    private DbContextOptions<SlaveContext> CreateDefaultDbContextOptions(string connectionString) => 
+        new DbContextOptionsBuilder<SlaveContext>()
+            .LogTo(action: Log.Logger.Information, 
+                filter: MigrationInfoLogFilter(), 
+                options: DbContextLoggerOptions.None
+                )
+            .UseMySql(
+                connectionString, 
+                new MySqlServerVersion(new Version(5, 7, 36)))
             .Options;
 
-    public async static Task<List<Cliente>> GetConfiguredTenants(IClienteRepository? clienteRepository) =>
-        await clienteRepository?.Select(w => !string.IsNullOrEmpty(w.Schema));
+
+
+    public async Task<List<Cliente>> GetConfiguredTenants() =>
+        await _clienteRepository?.Select(w => !string.IsNullOrEmpty(w.Schema))!;
     
-    public static async Task MigrateTenantDatabase(Cliente tenant, string defaultConnection)
+
+    public async Task MigrateTenantDatabase(Cliente tenant, string defaultConnection)
     {
         try
         {
@@ -71,7 +69,7 @@ public class MigrationHelper
         }
         catch (Exception e)
         {
-            Logger.Error(e, "Error occurred during migration");
+            await _logger.Error(e, "Error occurred during migration");
             throw;
         }
     }

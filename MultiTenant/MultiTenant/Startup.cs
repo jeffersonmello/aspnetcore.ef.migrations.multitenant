@@ -25,6 +25,7 @@ public static class Startup
         
         var masterConnectionString = builder.Configuration["Connections:Master"];
         var slaveDefaultConnectionString = builder.Configuration["Connections:SlaveDefault"];
+        var logConnectionString = builder.Configuration["Connections:Log"];
         
         builder.Services.AddDbContext<MasterContext>(options => 
             options.UseMySql(masterConnectionString, new MySqlServerVersion(new Version(5, 7, 36)))
@@ -35,6 +36,13 @@ public static class Startup
         
         builder.Services.AddDbContext<SlaveContext>(options => 
             options.UseMySql(slaveDefaultConnectionString, new MySqlServerVersion(new Version(5, 7, 36)))
+                .LogTo(Console.WriteLine, LogLevel.Information)
+                .EnableSensitiveDataLogging()
+                .EnableDetailedErrors()
+        );
+        
+        builder.Services.AddDbContext<LogContext>(options => 
+            options.UseMySql(logConnectionString, new MySqlServerVersion(new Version(5, 7, 36)))
                 .LogTo(Console.WriteLine, LogLevel.Information)
                 .EnableSensitiveDataLogging()
                 .EnableDetailedErrors()

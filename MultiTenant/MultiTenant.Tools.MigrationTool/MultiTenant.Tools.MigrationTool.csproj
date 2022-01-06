@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="AWSSDK.SecretsManager" Version="3.7.1.63" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.1">
         <PrivateAssets>all</PrivateAssets>
@@ -37,9 +38,19 @@
 
     <ItemGroup>
       <None Remove="appsettings.json" />
+      <Content Include="appsettings.example.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
       <Content Include="appsettings.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+      <None Remove="env.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="AppSettings.cs">
+        <DependentUpon>appsettings.json</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>

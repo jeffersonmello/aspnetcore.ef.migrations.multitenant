@@ -3,14 +3,17 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MultiTenant.Data.Context;
-using MultiTenant.Model.Master;
 using MultiTenant.Repository;
-using MultiTenant.Repository.Contract.Master;
 using MultiTenant.Tools.MigrationTool;
+using MultiTenant.Tools.MigrationTool.Logger;
+using MultiTenant.Tools.MigrationTool.Logger.Contract;
 
-static void LogAndConsole(string message)
+IApplicationLogger? logger;
+
+
+async Task LogAndConsole(string message)
 {
-    MigrationHelper.Logger.Information(message);
+    await logger?.Information(message)!;
     Console.WriteLine(message);
 }
 
@@ -22,39 +25,73 @@ var builder = new ConfigurationBuilder()
 
 var config = builder.Build();
 
+#region Connection Strings
+
 var masterConnectionString = config["Connections:Master"];
 var slaveDefaultConnectionString = config["Connections:SlaveDefault"];
+var logConnectionString = config["Connections:Log"];
+
+#endregion
+
+#region DbContext
 
 services.AddDbContext<MasterContext>(options => 
     options.UseMySql(masterConnectionString, new MySqlServerVersion(new Version(5, 7, 36)))
         .LogTo(Console.WriteLine, LogLevel.Information)
         .EnableSensitiveDataLogging()
-        .EnableDetailedErrors()
 );
+
+services.AddDbContext<LogContext>(options => 
+    options.UseMySql(logConnectionString, new MySqlServerVersion(new Version(5, 7, 36)))
+);
+
+#endregion
+
+#region Services
+
 services.AddRepository();
+services.AddScoped<IApplicationLogger, ApplicationLogger>();
+services.AddScoped<IMigrationHelper, MigrationHelper>();
+services.AddScoped(_ => new ConsoleSettings
+{
+    AwsAccessKey = config["Aws:access_key"],
+    AwsSecretKey = config["Aws:secret_key"],
+    AwsBucket = config["Aws:bucket_name"]
+});
+
+#endregion
 
 
 var serviceProvider = services.BuildServiceProvider();
 
+logger = serviceProvider.GetService<IApplicationLogger>();
+
+var migration = serviceProvider.GetService<IMigrationHelper>();
+
+
 Console.WriteLine("Para iniciar as migrações pressione qualquer tecla");
 Console.ReadKey();
 
-List<Cliente> tenants = await MigrationHelper.GetConfiguredTenants(serviceProvider.GetService<IClienteRepository>());
 
-IEnumerable<Task> tasks = tenants.Select(cliente => MigrationHelper.MigrateTenantDatabase(cliente, slaveDefaultConnectionString));
+var tenants = await migration?.GetConfiguredTenants()!;
+var tasks = tenants.Select(cliente => migration.MigrateTenantDatabase(cliente, slaveDefaultConnectionString));
 
 try
 {
-    LogAndConsole("Iniciando execução das migrações pendentes em paralelo...");
+    await LogAndConsole("Iniciando execução das migrações pendentes em paralelo...");
     await Task.WhenAll(tasks);
 }
 catch
 {
-    LogAndConsole("A execução das migrações em paralelo foi finalizada com erros.");
+    await LogAndConsole("A execução das migrações em paralelo foi finalizada com erros.");
     Console.WriteLine("Pressione qualquer tecla para finalizar");
     Console.ReadKey();
 }
 
-LogAndConsole("Migrações realizadas com sucesso");
+await LogAndConsole("Migrações realizadas com sucesso");
+
+await logger?.Error(new Exception("fdsfsfsd"), "sdsd")!;
+
 Console.WriteLine("Pressione qualquer tecla para finalizar");
 Console.ReadKey();
+

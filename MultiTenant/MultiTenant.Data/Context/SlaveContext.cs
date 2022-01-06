@@ -22,9 +22,5 @@ public class SlaveContext : DbContext
             .UseMySql(connectionString, new MySqlServerVersion(new Version(5, 7, 36))).Options)
     {
     }
-
-    public SlaveContext(DbContextOptions dbContextOptions)
-        : base(options: dbContextOptions)
-    {
-    }
+    
 }
